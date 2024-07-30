@@ -3,10 +3,11 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from '@inertiajs/react';
-import { User } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { PermissionHandler, User } from '@/types';
 
 export default function Authenticated({ user, header, children }: PropsWithChildren<{ user: User, header?: ReactNode }>) {
+    const page: { props: { can: PermissionHandler } } = usePage()
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
@@ -25,9 +26,16 @@ export default function Authenticated({ user, header, children }: PropsWithChild
                                 <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     Dashboard
                                 </NavLink>
-                                <NavLink href={route('students.index')} active={route().current('students.index')}>
-                                    Students
-                                </NavLink>
+                                {page.props.can.student_access &&
+                                    <NavLink href={route('students.index')} active={route().current('students.index')}>
+                                        Students
+                                    </NavLink>
+                                }
+                                {page.props.can.role_access &&
+                                    <NavLink href={route('roles.index')} active={route().current('roles.index')}>
+                                        Roles
+                                    </NavLink>
+                                }
                             </div>
                         </div>
 

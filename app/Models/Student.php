@@ -32,8 +32,10 @@ class Student extends Model
                         $request->class_id && $request->search,
                         function ($query) use ($request) {
                             $query->where('class_id', $request->class_id)
-                                ->where('name', 'LIKE', "%{$request->search}%")
-                                ->orWhere('email', 'LIKE', "%{$request->search}%");
+                                ->where(function ($q) use ($request) {
+                                    $q->where('name', 'LIKE', "%{$request->search}%")
+                                        ->orWhere('email', 'LIKE', "%{$request->search}%");
+                                });
                         }
                     )
                     ->when($request->search, function ($query) use ($request) {

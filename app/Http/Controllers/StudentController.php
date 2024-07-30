@@ -9,6 +9,7 @@ use App\Http\Resources\ClassResource;
 use App\Http\Resources\StudentResource;
 use App\Models\Classes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
 
@@ -19,6 +20,8 @@ class StudentController extends Controller
      */
     public function index(Request $request)
     {
+        Gate::authorize('student_access');
+
         $students = Student::search($request)->paginate(10);
 
         return inertia('Student/Index', [
@@ -34,6 +37,8 @@ class StudentController extends Controller
      */
     public function create()
     {
+        Gate::authorize('student_create');
+
         $classes = ClassResource::collection(Classes::all());
 
         return inertia('Student/Create', [
@@ -46,6 +51,7 @@ class StudentController extends Controller
      */
     public function store(StoreStudentRequest $request)
     {
+        Gate::authorize('student_create');
         Student::create($request->validated());
         return redirect()->route('students.index');
     }
@@ -63,6 +69,7 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
+        Gate::authorize('student_edit');
         $classes = ClassResource::collection(Classes::all());
 
         $previousUrl = URL::previous();
@@ -84,6 +91,7 @@ class StudentController extends Controller
      */
     public function update(UpdateStudentRequest $request, Student $student)
     {
+        Gate::authorize('student_edit');
         $student->update($request->validated());
 
         $previousUrl = Session::get('page');
@@ -95,6 +103,7 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
+        Gate::authorize('student_delete');
         $student->delete();
         return redirect()->back();
     }

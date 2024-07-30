@@ -1,13 +1,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { PageProps, StudentPageProps } from '@/types';
+import { PageProps, PermissionHandler, StudentPageProps } from '@/types';
 import Pagination from '@/Components/Pagination';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import MagnifyingGlass from '@/Components/icons/MagnifyingGlass';
 
 export default function Index({ auth, students, classes }: StudentPageProps) {
-    { console.log(classes) }
-    const page = usePage()
+    const page: { props: { can: PermissionHandler } } = usePage()
 
     const [searchTerm, setSearchTerm] = useState(String(usePage().props.search) || '');
     const [inputValue, setInputValue] = useState(String(usePage().props.search) || '')
@@ -52,10 +51,6 @@ export default function Index({ auth, students, classes }: StudentPageProps) {
     }, [studentsUrl])
 
     useEffect(() => {
-        if (inputValue.length === 0) {
-            return
-        }
-
         const handler = setTimeout(() => {
             setSearchTerm(inputValue)
             setPageNumber('')
@@ -95,12 +90,14 @@ export default function Index({ auth, students, classes }: StudentPageProps) {
                             </div>
 
                             <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                                <Link
-                                    href={route('students.create')}
-                                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
-                                >
-                                    Add Student
-                                </Link>
+                                {page.props.can.student_create &&
+                                    <Link
+                                        href={route('students.create')}
+                                        className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
+                                    >
+                                        Add Student
+                                    </Link>
+                                }
                             </div>
                         </div>
 
@@ -213,15 +210,19 @@ export default function Index({ auth, students, classes }: StudentPageProps) {
                                                         </td>
 
                                                         <td className="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-6">
-                                                            <Link
-                                                                href={route('students.edit', student.id)}
-                                                                className="text-indigo-600 hover:text-indigo-900"
-                                                            >
-                                                                Edit
-                                                            </Link>
-                                                            <button onClick={() => { deleteStudent(student.id, student.name) }} className="ml-2 text-indigo-600 hover:text-indigo-900">
-                                                                Delete
-                                                            </button>
+                                                            {page.props.can.student_edit &&
+                                                                <Link
+                                                                    href={route('students.edit', student.id)}
+                                                                    className="text-indigo-600 hover:text-indigo-900"
+                                                                >
+                                                                    Edit
+                                                                </Link>
+                                                            }
+                                                            {page.props.can.student_delete &&
+                                                                <button onClick={() => { deleteStudent(student.id, student.name) }} className="ml-2 text-indigo-600 hover:text-indigo-900">
+                                                                    Delete
+                                                                </button>
+                                                            }
                                                         </td>
                                                     </tr>
                                                 ))}

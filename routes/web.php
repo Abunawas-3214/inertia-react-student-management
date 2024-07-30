@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Foundation\Application;
@@ -26,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('/students', StudentController::class);
+    Route::resource('/roles', RoleController::class);
     Route::resource('/sections', SectionController::class)->only(['index']);
 });
 
